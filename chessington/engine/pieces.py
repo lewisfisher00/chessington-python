@@ -28,10 +28,31 @@ class Piece(ABC):
         current_square = board.find_piece(self)
         board.move_piece(current_square, new_square)
 
-    def is_at_edge_of_board(self, square):
+    def is_at_top_bottom_of_board(self, square):
         if ((self.player == Player.WHITE) & (square.row == 7)) | ((self.player == Player.BLACK) & (square.row == 0)):
             return True
         return False
+
+    @staticmethod
+    def is_at_edge_of_board(square):
+        if square.col == 0:
+            return 'left'
+        elif square.col == 7:
+            return 'right'
+        else:
+            return None
+
+    def check_capture(self, board, square, direction):
+        squares_to_check = []
+        squares_can_capture = []
+        squares_to_check = self.get_squares(square, squares_to_check, direction)
+        current_piece = board.get_piece(square)
+        for check_square in squares_to_check:
+            if not board.is_square_empty(check_square):
+                take_piece = board.get_piece(check_square)
+                if take_piece.player != current_piece.player:
+                    squares_can_capture.append(check_square)
+        return squares_can_capture
 
 
 class Pawn(Piece):
@@ -50,7 +71,7 @@ class Pawn(Piece):
         direction = 1 if self.player == Player.WHITE else -1
         next_square = Square.at(current_square.row + direction, current_square.col)
         # check edge
-        if self.is_at_edge_of_board(current_square):
+        if self.is_at_top_bottom_of_board(current_square):
             return moves
         # move 1
         if board.is_square_empty(next_square):
@@ -59,7 +80,21 @@ class Pawn(Piece):
             # move 2
             if (self.is_at_start_position(current_square)) & (board.is_square_empty(second_square)):
                 moves.append(Square.at(second_square.row, current_square.col))
+        squares_can_capture = self.check_capture(board, current_square, direction)
+        for square in squares_can_capture:
+            moves.append(square)
         return moves
+
+    def get_squares(self, square, squares_to_check, direction):
+        if self.is_at_edge_of_board(square) == 'left':
+            squares_to_check.append(Square.at(square.row + direction, square.col + 1))
+        elif self.is_at_edge_of_board(square) == 'right':
+            squares_to_check.append(Square.at(square.row + direction, square.col - 1))
+        else:
+            squares_to_check.append(Square.at(square.row + direction, square.col + 1))
+            squares_to_check.append(Square.at(square.row + direction, square.col - 1))
+        return squares_to_check
+
 
 
 class Knight(Piece):
