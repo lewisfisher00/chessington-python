@@ -58,6 +58,11 @@ class Board:
     def is_square_empty(self, square):
         return self.get_piece(square) is None
 
+    def capture_possible(self, current_position, candidate_position):
+        if self.get_piece(current_position).player != self.get_piece(candidate_position).player:
+            return True
+        return False
+
     def get_piece(self, square):
         """
         Retrieves the piece from the given square of the board.

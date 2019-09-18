@@ -28,15 +28,6 @@ class Piece(ABC):
         current_square = board.find_piece(self)
         board.move_piece(current_square, new_square)
 
-    @staticmethod
-    def is_at_top_bottom_of_board(square):
-        if square.row == 7:
-            return 'top'
-        elif square.row == 0:
-            return 'bottom'
-        else:
-            return 'fine'
-
 
 class Pawn(Piece):
     """
@@ -48,56 +39,34 @@ class Pawn(Piece):
             return True
         return False
 
-    def check_capture(self, board, square, direction):
-        squares_to_check = []
-        squares_can_capture = []
-        squares_to_check = self.get_squares(square, squares_to_check, direction)
-        current_piece = board.get_piece(square)
-        for check_square in squares_to_check:
-            if not board.is_square_empty(check_square):
-                take_piece = board.get_piece(check_square)
-                if take_piece.player != current_piece.player:
-                    squares_can_capture.append(check_square)
-        return squares_can_capture
-
-    @staticmethod
-    def is_at_edge_of_board(square):
-        if square.col == 0:
-            return 'left'
-        elif square.col == 7:
-            return 'right'
-        else:
-            return None
-
     def get_available_moves(self, board):
         moves = []
-        current_square = board.find_piece(self)
+        start_square = board.find_piece(self)
         direction = 1 if self.player == Player.WHITE else -1
-        next_square = Square.at(current_square.row + direction, current_square.col)
-        # check edge
-        if self.is_at_top_bottom_of_board(current_square) != 'fine':
-            return moves
-        # move 1
-        if board.is_square_empty(next_square):
-            moves.append(Square.at(next_square.row, current_square.col))
-            second_square = Square.at(next_square.row + direction, next_square.col)
-            # move 2
-            if (self.is_at_start_position(current_square)) & (board.is_square_empty(second_square)):
-                moves.append(Square.at(second_square.row, current_square.col))
-        squares_can_capture = self.check_capture(board, current_square, direction)
-        for square in squares_can_capture:
-            moves.append(square)
+        candidate_square = Square.at(start_square.row + direction, start_square.col)
+        if candidate_square.is_on_board():
+            # move 1
+            if board.is_square_empty(candidate_square):
+                moves.append(Square.at(candidate_square.row, candidate_square.col))
+                # move 2
+                candidate_square = Square.at(candidate_square.row + direction, candidate_square.col)
+                if self.is_at_start_position(start_square):
+                    if candidate_square.is_on_board() & board.is_square_empty(candidate_square):
+                        moves.append(Square.at(candidate_square.row, candidate_square.col))
+        # capture
+        candidate_square = Square.at(start_square.row + direction, start_square.col + 1)
+        moves += self.check_diagonal(board, start_square, candidate_square)
+        candidate_square = Square.at(start_square.row + direction, start_square.col - 1)
+        moves += self.check_diagonal(board, start_square, candidate_square)
         return moves
 
-    def get_squares(self, square, squares_to_check, direction):
-        if self.is_at_edge_of_board(square) == 'left':
-            squares_to_check.append(Square.at(square.row + direction, square.col + 1))
-        elif self.is_at_edge_of_board(square) == 'right':
-            squares_to_check.append(Square.at(square.row + direction, square.col - 1))
-        else:
-            squares_to_check.append(Square.at(square.row + direction, square.col + 1))
-            squares_to_check.append(Square.at(square.row + direction, square.col - 1))
-        return squares_to_check
+    @staticmethod
+    def check_diagonal(board, start_square, candidate_square):
+        moves = []
+        if candidate_square.is_on_board():
+            if board.capture_possible(start_square, candidate_square):
+                moves.append(Square.at(candidate_square.row, candidate_square.col))
+        return moves
 
 
 class Knight(Piece):
@@ -149,29 +118,19 @@ class Rook(Piece):
 
         while True:
             move_vector = (direction[0] * distance, direction[1] * distance)
-            candidate_move = start_position.translate_by(move_vector)
-            if candidate_move.is_on_board():
-                if board.is_square_empty(candidate_move):
-                    valid_moves.append(candidate_move)
+            candidate_position = start_position.translate_by(move_vector)
+            if candidate_position.is_on_board():
+                if board.is_square_empty(candidate_position):
+                    valid_moves.append(candidate_position)
                     distance += 1
-                elif not board.get_piece(candidate_move).player == board.get_piece(start_position).player:
-                    valid_moves.append(candidate_move)
+                elif board.capture_possible(start_position, candidate_position):
+                    valid_moves.append(candidate_position)
                     break
                 else:
                     break
             else:
                 break
         return valid_moves
-
-
-    @staticmethod
-    def can_capture(current_square, check_square, board):
-        current_piece = board.get_piece(current_square)
-        check_piece = board.get_piece(check_square)
-        if check_piece.player != current_piece.player:
-            return True
-        else:
-            return False
 
 
 class Queen(Piece):
