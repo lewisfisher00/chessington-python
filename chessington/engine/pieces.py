@@ -28,6 +28,11 @@ class Piece(ABC):
         current_square = board.find_piece(self)
         board.move_piece(current_square, new_square)
 
+    def is_at_edge_of_board(self, square):
+        if ((self.player == Player.WHITE) & (square.row == 7)) | ((self.player == Player.BLACK) & (square.row == 0)):
+            return True
+        return False
+
 
 class Pawn(Piece):
     """
@@ -44,11 +49,16 @@ class Pawn(Piece):
         current_square = board.find_piece(self)
         direction = 1 if self.player == Player.WHITE else -1
         next_square = Square.at(current_square.row + direction, current_square.col)
+        # check edge
+        if self.is_at_edge_of_board(current_square):
+            return moves
+        # move 1
         if board.is_square_empty(next_square):
+            moves.append(Square.at(next_square.row, current_square.col))
             second_square = Square.at(next_square.row + direction, next_square.col)
+            # move 2
             if (self.is_at_start_position(current_square)) & (board.is_square_empty(second_square)):
                 moves.append(Square.at(second_square.row, current_square.col))
-            moves.append(Square.at(next_square.row, current_square.col))
         return moves
 
 
