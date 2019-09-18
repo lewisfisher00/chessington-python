@@ -335,7 +335,7 @@ class TestPawns:
 
     @staticmethod
     def test_rook_can_move_vertically():
-         # Arrange
+        # Arrange
         board = Board.empty()
         rook = Rook(Player.BLACK)
         rook_square = Square.at(4, 4)
@@ -388,6 +388,22 @@ class TestPawns:
         assert Square.at(8, 4) not in moves
         assert Square.at(-1, 4) not in moves
 
+    @staticmethod
+    def test_rook_can_move_horizontally():
+        # Arrange
+        board = Board.empty()
+        rook = Rook(Player.BLACK)
+        rook_square = Square.at(4, 4)
+        board.set_piece(rook_square, rook)
+
+        # Act
+        moves = rook.get_available_moves(board)
+
+        # Assert
+        assert Square.at(4, 5) in moves
+        assert Square.at(4, 6) in moves
+        assert Square.at(4, 3) in moves
+        assert Square.at(4, 2) in moves
 
 
 

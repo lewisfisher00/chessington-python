@@ -127,8 +127,44 @@ class Rook(Piece):
         moves = []
         current_square = board.find_piece(self)
         row_index = current_square.row
+        col_index = current_square.col
+        max_right = 0
+        max_left = col_index
         max_up = 0
         max_down = row_index
+        moves = self.move_vertical(board, moves, row_index, max_up, max_down, current_square)
+        moves = self.move_horizontal(board, moves, col_index, max_right, max_left, current_square)
+        return moves
+
+    def move_horizontal(self, board, moves, col_index, max_right, max_left, current_square):
+        while col_index < 7:
+            max_right += 1
+            col_index += 1
+        move = 1
+        while move in range(1, max_right + 1):
+            next_square = Square.at(current_square.row, current_square.col + move)
+            if board.is_square_empty(next_square):
+                moves.append(Square.at(next_square.row, next_square.col))
+                move += 1
+            elif self.can_capture(current_square, next_square, board):
+                moves.append(Square.at(next_square.row, next_square.col))
+                move = 8
+            else:
+                move = 8
+        move = 1
+        while move in range(1, max_left + 1):
+            next_square = Square.at(current_square.row, current_square.col - move)
+            if board.is_square_empty(next_square):
+                moves.append(Square.at(next_square.row, next_square.col))
+                move += 1
+            elif self.can_capture(current_square, next_square, board):
+                moves.append(Square.at(next_square.row, next_square.col))
+                move = 8
+            else:
+                move = 8
+        return moves
+
+    def move_vertical(self, board, moves, row_index, max_up, max_down, current_square):
         while row_index < 7:
             max_up += 1
             row_index += 1
