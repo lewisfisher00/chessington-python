@@ -55,6 +55,9 @@ class Board:
         """
         self.board[square.row][square.col] = piece
 
+    def is_square_empty(self, square):
+        return self.get_piece(square) is None
+
     def get_piece(self, square):
         """
         Retrieves the piece from the given square of the board.

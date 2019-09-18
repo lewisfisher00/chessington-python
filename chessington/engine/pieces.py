@@ -33,17 +33,22 @@ class Pawn(Piece):
     """
     A class representing a chess pawn.
     """
+    def is_at_start_position(self, current_square):
+        if (((self.player == Player.WHITE) & (current_square.row == 1)) |
+                ((self.player == Player.BLACK) & (current_square.row == 6))):
+            return True
+        return False
 
     def get_available_moves(self, board):
         moves = []
         current_square = board.find_piece(self)
         direction = 1 if self.player == Player.WHITE else -1
-        if (((self.player == Player.WHITE) & (current_square.row == 1)) |
-                ((self.player == Player.BLACK) & (current_square.row == 6))):
-            moves.append(Square.at(current_square.row + direction, current_square.col))
-            moves.append(Square.at(current_square.row + direction*2, current_square.col))
-        else:
-            moves.append(Square.at(current_square.row + direction, current_square.col))
+        next_square = Square.at(current_square.row + direction, current_square.col)
+        if board.is_square_empty(next_square):
+            second_square = Square.at(next_square.row + direction, next_square.col)
+            if (self.is_at_start_position(current_square)) & (board.is_square_empty(second_square)):
+                moves.append(Square.at(second_square.row, current_square.col))
+            moves.append(Square.at(next_square.row, current_square.col))
         return moves
 
 
