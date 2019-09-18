@@ -1,6 +1,7 @@
 from chessington.engine.board import Board
 from chessington.engine.data import Player, Square
-from chessington.engine.pieces import Pawn
+from chessington.engine.pieces import Pawn, Rook
+
 
 class TestPawns:
 
@@ -331,3 +332,62 @@ class TestPawns:
         # Assert
         assert Square.at(2, 3) not in moves
         assert Square.at(2, 5) not in moves
+
+    @staticmethod
+    def test_rook_can_move_vertically():
+         # Arrange
+        board = Board.empty()
+        rook = Rook(Player.BLACK)
+        rook_square = Square.at(4, 4)
+        board.set_piece(rook_square, rook)
+
+        # Act
+        moves = rook.get_available_moves(board)
+
+        # Assert
+        assert Square.at(5, 4) in moves
+        assert Square.at(6, 4) in moves
+        assert Square.at(3, 4) in moves
+        assert Square.at(2, 4) in moves
+
+    @staticmethod
+    def test_rook_cannot_move_if_piece_in_front():
+        # Arrange
+        board = Board.empty()
+        rook = Rook(Player.BLACK)
+        rook_square = Square.at(4, 4)
+        board.set_piece(rook_square, rook)
+
+        enemy = Pawn(Player.WHITE)
+        enemy_square = Square.at(5, 4)
+        board.set_piece(enemy_square, enemy)
+
+        # Act
+        moves = rook.get_available_moves(board)
+
+        # Assert
+        assert Square.at(5, 4) in moves
+        assert Square.at(6, 4) not in moves
+        assert Square.at(7, 4) not in moves
+        assert Square.at(2, 4) in moves
+
+
+    @staticmethod
+    def test_rook_cannot_move_off_board():
+        # Arrange
+        board = Board.empty()
+        rook = Rook(Player.BLACK)
+        rook_square = Square.at(4, 4)
+        board.set_piece(rook_square, rook)
+
+        # Act
+        moves = rook.get_available_moves(board)
+        # Assert
+        assert Square.at(0, 4) in moves
+        assert Square.at(7, 4) in moves
+        assert Square.at(8, 4) not in moves
+        assert Square.at(-1, 4) not in moves
+
+
+
+
