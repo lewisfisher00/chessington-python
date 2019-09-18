@@ -28,3 +28,12 @@ class Square(namedtuple('Square', 'row col')):
         Creates a square at the given row and column.
         """
         return Square(row=row, col=col)
+
+    def translate_by(self, vector):
+        return Square(self.row + vector[0], self.col + vector[1])
+
+    def is_on_board(self):
+        if 0 <= self.row <= 7:
+            if 0 <= self.col <= 7:
+                return True
+        return False

@@ -366,6 +366,7 @@ class TestPawns:
         moves = rook.get_available_moves(board)
 
         # Assert
+        print(moves)
         assert Square.at(5, 4) in moves
         assert Square.at(6, 4) not in moves
         assert Square.at(7, 4) not in moves

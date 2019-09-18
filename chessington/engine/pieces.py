@@ -124,73 +124,45 @@ class Rook(Piece):
     """
 
     def get_available_moves(self, board):
-        moves = []
-        current_square = board.find_piece(self)
-        row_index = current_square.row
-        col_index = current_square.col
-        max_right = 0
-        max_left = col_index
-        max_up = 0
-        max_down = row_index
-        moves = self.move_vertical(board, moves, row_index, max_up, max_down, current_square)
-        moves = self.move_horizontal(board, moves, col_index, max_right, max_left, current_square)
+        moves = self.get_vertical_moves(board)
+        moves += self.get_horizontal_moves(board)
         return moves
 
-    def move_horizontal(self, board, moves, col_index, max_right, max_left, current_square):
-        while col_index < 7:
-            max_right += 1
-            col_index += 1
-        move = 1
-        while move in range(1, max_right + 1):
-            next_square = Square.at(current_square.row, current_square.col + move)
-            if board.is_square_empty(next_square):
-                moves.append(Square.at(next_square.row, next_square.col))
-                move += 1
-            elif self.can_capture(current_square, next_square, board):
-                moves.append(Square.at(next_square.row, next_square.col))
-                move = 8
-            else:
-                move = 8
-        move = 1
-        while move in range(1, max_left + 1):
-            next_square = Square.at(current_square.row, current_square.col - move)
-            if board.is_square_empty(next_square):
-                moves.append(Square.at(next_square.row, next_square.col))
-                move += 1
-            elif self.can_capture(current_square, next_square, board):
-                moves.append(Square.at(next_square.row, next_square.col))
-                move = 8
-            else:
-                move = 8
-        return moves
+    def get_vertical_moves(self, board):
+        up = (1, 0)
+        up_moves = self.get_moves_in_direction(board, up)
+        down = (-1, 0)
+        down_moves = self.get_moves_in_direction(board, down)
+        return up_moves + down_moves
 
-    def move_vertical(self, board, moves, row_index, max_up, max_down, current_square):
-        while row_index < 7:
-            max_up += 1
-            row_index += 1
-        move = 1
-        while move in range(1, max_up + 1):
-            next_square = Square.at(current_square.row + move, current_square.col)
-            if board.is_square_empty(next_square):
-                moves.append(Square.at(next_square.row, next_square.col))
-                move += 1
-            elif self.can_capture(current_square, next_square, board):
-                moves.append(Square.at(next_square.row, next_square.col))
-                move = 8
+    def get_horizontal_moves(self, board):
+        right = (0, 1)
+        up_moves = self.get_moves_in_direction(board, right)
+        left = (0, -1)
+        down_moves = self.get_moves_in_direction(board, left)
+        return up_moves + down_moves
+
+    def get_moves_in_direction(self, board, direction):
+        valid_moves = []
+        distance = 1
+        start_position = board.find_piece(self)
+
+        while True:
+            move_vector = (direction[0] * distance, direction[1] * distance)
+            candidate_move = start_position.translate_by(move_vector)
+            if candidate_move.is_on_board():
+                if board.is_square_empty(candidate_move):
+                    valid_moves.append(candidate_move)
+                    distance += 1
+                elif not board.get_piece(candidate_move).player == board.get_piece(start_position).player:
+                    valid_moves.append(candidate_move)
+                    break
+                else:
+                    break
             else:
-                move = 8
-        move = 1
-        while move in range(1, max_down + 1):
-            next_square = Square.at(current_square.row - move, current_square.col)
-            if board.is_square_empty(next_square):
-                moves.append(Square.at(next_square.row, next_square.col))
-                move += 1
-            elif self.can_capture(current_square, next_square, board):
-                moves.append(Square.at(next_square.row, next_square.col))
-                move = 8
-            else:
-                move = 8
-        return moves
+                break
+        return valid_moves
+
 
     @staticmethod
     def can_capture(current_square, check_square, board):
