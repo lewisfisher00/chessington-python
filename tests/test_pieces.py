@@ -724,7 +724,7 @@ class TestPawns:
         friend_square1 = Square.at(0, 7)
         board.set_piece(friend_square1, friend1)
 
-        friend2 = Pawn(Player.WHITE)
+        friend2 = Rook(Player.WHITE)
         friend_square2 = Square.at(0, 0)
         board.set_piece(friend_square2, friend2)
 
@@ -732,5 +732,5 @@ class TestPawns:
         moves = king.get_available_moves(board)
 
         # Assert
-        assert Square.at(0, 1) in moves
+        assert Square.at(0, 2) in moves
         assert Square.at(0, 6) in moves

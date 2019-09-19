@@ -76,7 +76,7 @@ class Pawn(Piece):
                 if self.is_at_start_position(start_square):
                     if candidate_square.is_on_board() & board.is_square_empty(candidate_square):
                         moves.append(Square.at(candidate_square.row, candidate_square.col))
-            # capture
+        # capture
         candidate_square = Square.at(start_square.row + direction, start_square.col + 1)
         moves += self.check_diagonal(board, start_square, candidate_square)
         candidate_square = Square.at(start_square.row + direction, start_square.col - 1)
@@ -246,31 +246,37 @@ class King(Piece):
         moves += self.get_bs_moves(board)
         moves += self.get_vertical_moves(board)
         moves += self.get_horizontal_moves(board)
-        # if self.can_castle(board) is not None:
-        #     moves.append(self.can_castle(board)[0])
+        moves += self.can_castle(board)
         return moves
 
-    # def can_castle(self, board):
-    #     if not self.moved:
-    #         current_square = board.find_piece(self)
-    #         check_square = Square.at(current_square.row, 7)
-    #         check_range = [5, 7, 6]
-    #         self.check_castle_is_available(board, current_square, check_square, check_range)
-    #         check_square = Square.at(current_square.row, 0)
-    #         check_range = [1, 4, 2]
-    #         self.check_castle_is_available(board, current_square, check_square, check_range)
-    #         return None
-    #
-    # @staticmethod
-    # def check_castle_is_available(board, current_square, check_square, check_distance):
-    #     check_piece = board.get_piece(check_square)
-    #     available = True
-    #     if isinstance(check_piece, Rook) & (not check_piece.moved):
-    #         for square in range(check_distance[0], check_distance[1]):
-    #             if not board.is_square_empty(Square.at(current_square.row, square)):
-    #                 available = False
-    #         if available:
-    #             return current_square, Square.at(current_square.row, check_distance[2])
+    def can_castle(self, board):
+        # king hasn't moved
+        if self.moved:
+            return []
+        corners = {
+            Player.WHITE: [Square.at(0, 0), Square.at(0, 7)],
+            Player.BLACK: [Square.at(7, 0), Square.at(7, 7)]
+        }[self.player]
+        castle_moves = []
+        for corner in corners:
+            if board.is_square_empty(corner):
+                continue
+            corner_piece = board.get_piece(corner)
+            # rook hasn't moved
+            if isinstance(corner_piece, Rook) and not corner_piece.moved:
+                # nothing in the middle
+                squares_to_corner = [
+                    Square.at(corner.row, 1),
+                    Square.at(corner.row, 2),
+                    Square.at(corner.row, 3)
+                ] if corner.col == 0 else [
+                    Square.at(corner.row, 5),
+                    Square.at(corner.row, 6)
+                ]
+                end_position = Square.at(corner.row, 2 if corner.col == 0 else 6)
+                if board.are_squares_empty(squares_to_corner):
+                    castle_moves.append(end_position)
+        return castle_moves
 
     def get_fs_moves(self, board):
         up = (1, 1)

@@ -19,6 +19,7 @@ class Board:
     def __init__(self, player, board_state):
         self.current_player = Player.WHITE
         self.board = board_state
+        self.last_move = None
 
     @staticmethod
     def empty():
@@ -55,6 +56,9 @@ class Board:
         """
         self.board[square.row][square.col] = piece
 
+    def are_squares_empty(self, squares):
+        return all(map(lambda s: self.is_square_empty(s), squares))
+
     def is_square_empty(self, square):
         return self.get_piece(square) is None
 
@@ -87,7 +91,22 @@ class Board:
         if moving_piece is not None and moving_piece.player == self.current_player:
             if isinstance(moving_piece, Pawn) & (to_square.row == 0 or to_square.row == 7):
                 moving_piece = Queen(self.current_player)
+            self.handle_castling(from_square, to_square, moving_piece)
             self.set_piece(to_square, moving_piece)
             self.set_piece(from_square, None)
             moving_piece.moved = True
+            self.last_move = (moving_piece, to_square)
             self.current_player = self.current_player.opponent()
+
+    def handle_castling(self, from_square, to_square, piece):
+        if not isinstance(piece, King):
+            return
+        if abs(from_square.col - to_square.col) > 1:
+            if to_square.col == 2:
+                rook = self.get_piece(Square.at(to_square.row, 0))
+                self.set_piece(Square.at(to_square.row, 3), rook)
+                self.set_piece(Square.at(to_square.row, 0), None)
+            else:
+                rook = self.get_piece(Square.at(to_square.row, 7))
+                self.set_piece(Square.at(to_square.row, 5), rook)
+                self.set_piece(Square.at(to_square.row, 7), None)
