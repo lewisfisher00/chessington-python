@@ -53,7 +53,7 @@ class Pawn(Piece):
                 if self.is_at_start_position(start_square):
                     if candidate_square.is_on_board() & board.is_square_empty(candidate_square):
                         moves.append(Square.at(candidate_square.row, candidate_square.col))
-        # capture
+            # capture
         candidate_square = Square.at(start_square.row + direction, start_square.col + 1)
         moves += self.check_diagonal(board, start_square, candidate_square)
         candidate_square = Square.at(start_square.row + direction, start_square.col - 1)
@@ -64,8 +64,9 @@ class Pawn(Piece):
     def check_diagonal(board, start_square, candidate_square):
         moves = []
         if candidate_square.is_on_board():
-            if board.capture_possible(start_square, candidate_square):
-                moves.append(Square.at(candidate_square.row, candidate_square.col))
+            if not board.is_square_empty(candidate_square):
+                if board.capture_possible(start_square, candidate_square):
+                    moves.append(Square.at(candidate_square.row, candidate_square.col))
         return moves
 
 
