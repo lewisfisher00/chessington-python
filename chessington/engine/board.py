@@ -85,7 +85,7 @@ class Board:
         """
         moving_piece = self.get_piece(from_square)
         if moving_piece is not None and moving_piece.player == self.current_player:
-            if isinstance(moving_piece, Pawn) & (to_square.row == 0 | to_square.row == 7):
+            if isinstance(moving_piece, Pawn) & (to_square.row == 0 or to_square.row == 7):
                 moving_piece = Queen(self.current_player)
             self.set_piece(to_square, moving_piece)
             self.set_piece(from_square, None)

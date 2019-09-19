@@ -711,3 +711,26 @@ class TestPawns:
         # Assert
         assert Square.at(-1, -1) not in moves
         assert Square.at(0, 1) in moves
+
+    @staticmethod
+    def test_king_can_castle():
+        # Arrange
+        board = Board.empty()
+        king = King(Player.WHITE)
+        king_square = Square.at(0, 4)
+        board.set_piece(king_square, king)
+
+        friend1 = Rook(Player.WHITE)
+        friend_square1 = Square.at(0, 7)
+        board.set_piece(friend_square1, friend1)
+
+        friend2 = Pawn(Player.WHITE)
+        friend_square2 = Square.at(0, 0)
+        board.set_piece(friend_square2, friend2)
+
+        # Act
+        moves = king.get_available_moves(board)
+
+        # Assert
+        assert Square.at(0, 1) in moves
+        assert Square.at(0, 6) in moves

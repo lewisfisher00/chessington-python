@@ -246,8 +246,8 @@ class King(Piece):
         moves += self.get_bs_moves(board)
         moves += self.get_vertical_moves(board)
         moves += self.get_horizontal_moves(board)
-        # if not self.can_castle(board) is None:
-        #     moves += self.can_castle(board)[0]
+        # if self.can_castle(board) is not None:
+        #     moves.append(self.can_castle(board)[0])
         return moves
 
     # def can_castle(self, board):
@@ -255,14 +255,14 @@ class King(Piece):
     #         current_square = board.find_piece(self)
     #         check_square = Square.at(current_square.row, 7)
     #         check_range = [5, 7, 6]
-    #         self.check_castle_is_free(board, current_square, check_square, check_range)
+    #         self.check_castle_is_available(board, current_square, check_square, check_range)
     #         check_square = Square.at(current_square.row, 0)
     #         check_range = [1, 4, 2]
-    #         self.check_castle_is_free(board, current_square, check_square, check_range)
+    #         self.check_castle_is_available(board, current_square, check_square, check_range)
     #         return None
     #
     # @staticmethod
-    # def check_castle_is_free(board, current_square, check_square, check_distance):
+    # def check_castle_is_available(board, current_square, check_square, check_distance):
     #     check_piece = board.get_piece(check_square)
     #     available = True
     #     if isinstance(check_piece, Rook) & (not check_piece.moved):
