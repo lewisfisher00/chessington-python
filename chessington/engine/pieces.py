@@ -14,6 +14,7 @@ class Piece(ABC):
 
     def __init__(self, player):
         self.player = player
+        self.moved = False
 
     @abstractmethod
     def get_available_moves(self, board):
@@ -245,7 +246,31 @@ class King(Piece):
         moves += self.get_bs_moves(board)
         moves += self.get_vertical_moves(board)
         moves += self.get_horizontal_moves(board)
+        # if not self.can_castle(board) is None:
+        #     moves += self.can_castle(board)[0]
         return moves
+
+    # def can_castle(self, board):
+    #     if not self.moved:
+    #         current_square = board.find_piece(self)
+    #         check_square = Square.at(current_square.row, 7)
+    #         check_range = [5, 7, 6]
+    #         self.check_castle_is_free(board, current_square, check_square, check_range)
+    #         check_square = Square.at(current_square.row, 0)
+    #         check_range = [1, 4, 2]
+    #         self.check_castle_is_free(board, current_square, check_square, check_range)
+    #         return None
+    #
+    # @staticmethod
+    # def check_castle_is_free(board, current_square, check_square, check_distance):
+    #     check_piece = board.get_piece(check_square)
+    #     available = True
+    #     if isinstance(check_piece, Rook) & (not check_piece.moved):
+    #         for square in range(check_distance[0], check_distance[1]):
+    #             if not board.is_square_empty(Square.at(current_square.row, square)):
+    #                 available = False
+    #         if available:
+    #             return current_square, Square.at(current_square.row, check_distance[2])
 
     def get_fs_moves(self, board):
         up = (1, 1)
@@ -288,4 +313,3 @@ class King(Piece):
             elif board.capture_possible(start_position, candidate_position):
                 valid_moves.append(candidate_position)
         return valid_moves
-

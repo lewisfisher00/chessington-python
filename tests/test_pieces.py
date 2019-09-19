@@ -711,5 +711,3 @@ class TestPawns:
         # Assert
         assert Square.at(-1, -1) not in moves
         assert Square.at(0, 1) in moves
-
-
