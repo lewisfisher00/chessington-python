@@ -98,7 +98,52 @@ class Knight(Piece):
     """
 
     def get_available_moves(self, board):
-        return []
+        moves = self.get_upright_moves(board)
+        moves += self.get_downright_moves(board)
+        moves += self.get_downleft_moves(board)
+        moves += self.get_upleft_moves(board)
+        return moves
+
+    def get_upright_moves(self, board):
+        right = (1, 2)
+        right_moves = self.get_moves_in_direction(board, right)
+        up = (2, 1)
+        up_moves = self.get_moves_in_direction(board, up)
+        return up_moves + right_moves
+
+    def get_downright_moves(self, board):
+        right = (-1, 2)
+        right_moves = self.get_moves_in_direction(board, right)
+        down = (-2, 1)
+        down_moves = self.get_moves_in_direction(board, down)
+        return down_moves + right_moves
+
+    def get_downleft_moves(self, board):
+        left = (-1, -2)
+        left_moves = self.get_moves_in_direction(board, left)
+        down = (-2, -1)
+        down_moves = self.get_moves_in_direction(board, down)
+        return left_moves + down_moves
+
+    def get_upleft_moves(self, board):
+        left = (1, -2)
+        left_moves = self.get_moves_in_direction(board, left)
+        up = (2, -1)
+        up_moves = self.get_moves_in_direction(board, up)
+        return up_moves + left_moves
+
+    def get_moves_in_direction(self, board, direction):
+        valid_moves = []
+        distance = 1
+        start_position = board.find_piece(self)
+        move_vector = (direction[0] * distance, direction[1] * distance)
+        candidate_position = start_position.translate_by(move_vector)
+        if candidate_position.is_on_board():
+            if board.is_square_empty(candidate_position):
+                valid_moves.append(candidate_position)
+            elif board.capture_possible(start_position, candidate_position):
+                valid_moves.append(candidate_position)
+        return valid_moves
 
 
 class Bishop(Piece):
