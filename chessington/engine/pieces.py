@@ -196,4 +196,51 @@ class King(Piece):
     """
 
     def get_available_moves(self, board):
-        return []
+        moves = self.get_fs_moves(board)
+        moves += self.get_bs_moves(board)
+        moves += self.get_vertical_moves(board)
+        moves += self.get_horizontal_moves(board)
+        return moves
+
+    def get_fs_moves(self, board):
+        up = (1, 1)
+        up_moves = self.get_moves_in_direction(board, up)
+        down = (-1, -1)
+        down_moves = self.get_moves_in_direction(board, down)
+        return up_moves + down_moves
+
+    def get_bs_moves(self, board):
+        right = (-1, 1)
+        up_moves = self.get_moves_in_direction(board, right)
+        left = (1, -1)
+        down_moves = self.get_moves_in_direction(board, left)
+        return up_moves + down_moves
+
+    def get_vertical_moves(self, board):
+        up = (1, 0)
+        up_moves = self.get_moves_in_direction(board, up)
+        down = (-1, 0)
+        down_moves = self.get_moves_in_direction(board, down)
+        return up_moves + down_moves
+
+    def get_horizontal_moves(self, board):
+        right = (0, 1)
+        up_moves = self.get_moves_in_direction(board, right)
+        left = (0, -1)
+        down_moves = self.get_moves_in_direction(board, left)
+        return up_moves + down_moves
+
+    def get_moves_in_direction(self, board, direction):
+        valid_moves = []
+        distance = 1
+        start_position = board.find_piece(self)
+
+        move_vector = (direction[0] * distance, direction[1] * distance)
+        candidate_position = start_position.translate_by(move_vector)
+        if candidate_position.is_on_board():
+            if board.is_square_empty(candidate_position):
+                valid_moves.append(candidate_position)
+            elif board.capture_possible(start_position, candidate_position):
+                valid_moves.append(candidate_position)
+        return valid_moves
+

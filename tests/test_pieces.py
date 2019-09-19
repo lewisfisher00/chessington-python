@@ -1,6 +1,6 @@
 from chessington.engine.board import Board
 from chessington.engine.data import Player, Square
-from chessington.engine.pieces import Pawn, Rook, Bishop, Queen
+from chessington.engine.pieces import Pawn, Rook, Bishop, Queen, King
 
 
 class TestPawns:
@@ -569,7 +569,7 @@ class TestPawns:
         assert Square.at(6, 2) in moves
 
     @staticmethod
-    def test_queen_can_move_vertically():
+    def test_queen_can_move_1_vertically():
         # Arrange
         board = Board.empty()
         queen = Queen(Player.BLACK)
@@ -585,5 +585,131 @@ class TestPawns:
         assert Square.at(3, 4) in moves
         assert Square.at(2, 4) in moves
 
+    @staticmethod
+    def test_king_can_move_1_vertically():
+        # Arrange
+        board = Board.empty()
+        king = King(Player.BLACK)
+        king_square = Square.at(4, 4)
+        board.set_piece(king_square, king)
+
+        # Act
+        moves = king.get_available_moves(board)
+
+        # Assert
+        assert Square.at(5, 4) in moves
+        assert Square.at(6, 4) not in moves
+        assert Square.at(3, 4) in moves
+        assert Square.at(2, 4) not in moves
+
+    @staticmethod
+    def test_king_can_move_1_horizontally():
+        # Arrange
+        board = Board.empty()
+        king = King(Player.BLACK)
+        king_square = Square.at(4, 4)
+        board.set_piece(king_square, king)
+
+        # Act
+        moves = king.get_available_moves(board)
+
+        # Assert
+        assert Square.at(4, 5) in moves
+        assert Square.at(4, 6) not in moves
+        assert Square.at(4, 3) in moves
+        assert Square.at(4, 2) not in moves
+
+    @staticmethod
+    def test_king_can_move_1_forwardslash():
+        # Arrange
+        board = Board.empty()
+        king = King(Player.BLACK)
+        king_square = Square.at(4, 4)
+        board.set_piece(king_square, king)
+
+        # Act
+        moves = king.get_available_moves(board)
+
+        # Assert
+        assert Square.at(5, 5) in moves
+        assert Square.at(6, 6) not in moves
+        assert Square.at(3, 3) in moves
+        assert Square.at(2, 2) not in moves
+
+    @staticmethod
+    def test_king_can_move_1_backslash():
+        # Arrange
+        board = Board.empty()
+        king = King(Player.BLACK)
+        king_square = Square.at(4, 4)
+        board.set_piece(king_square, king)
+
+        # Act
+        moves = king.get_available_moves(board)
+
+        # Assert
+        assert Square.at(3, 5) in moves
+        assert Square.at(2, 6) not in moves
+        assert Square.at(5, 3) in moves
+        assert Square.at(6, 2) not in moves
+
+    @staticmethod
+    def test_king_cannot_move_if_piece_in_front():
+        # Arrange
+        board = Board.empty()
+        king = King(Player.WHITE)
+        king_square = Square.at(4, 4)
+        board.set_piece(king_square, king)
+
+        friend = Pawn(Player.WHITE)
+        friend_square = Square.at(5, 5)
+        board.set_piece(friend_square, friend)
+
+        friend2 = Pawn(Player.WHITE)
+        friendly_square2 = Square.at(3, 4)
+        board.set_piece(friendly_square2, friend2)
+
+        enemy = Pawn(Player.BLACK)
+        enemy_square = Square.at(5, 4)
+        board.set_piece(enemy_square, enemy)
+
+        # Act
+        moves = king.get_available_moves(board)
+
+        # Assert
+        print(moves)
+        assert Square.at(5, 5) not in moves
+        assert Square.at(3, 4) not in moves
+        assert Square.at(5, 4) in moves
+
+    @staticmethod
+    def test_king_cannot_move_off_board_up():
+        # Arrange
+        board = Board.empty()
+        king = King(Player.BLACK)
+        king_square = Square.at(7, 7)
+        board.set_piece(king_square, king)
+
+        # Act
+        moves = king.get_available_moves(board)
+
+        # Assert
+        assert Square.at(7, 6) in moves
+        assert Square.at(8, 8) not in moves
+
+    @staticmethod
+    def test_king_cannot_move_off_board_down():
+        # Arrange
+        board = Board.empty()
+        king = King(Player.WHITE)
+        king_square = Square.at(0, 0)
+        board.set_piece(king_square, king)
+
+        # Act
+        moves = king.get_available_moves(board)
+
+        # Assert
+        assert Square.at(-1, -1) not in moves
+        assert Square.at(0, 1) in moves
 
 
