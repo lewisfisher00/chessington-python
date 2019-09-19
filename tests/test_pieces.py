@@ -1,6 +1,6 @@
 from chessington.engine.board import Board
 from chessington.engine.data import Player, Square
-from chessington.engine.pieces import Pawn, Rook
+from chessington.engine.pieces import Pawn, Rook, Bishop, Queen
 
 
 class TestPawns:
@@ -316,7 +316,7 @@ class TestPawns:
     @staticmethod
     def test_black_pawns_cannot_move_diagonally_except_to_capture():
 
-         # Arrange
+        # Arrange
         board = Board.empty()
         pawn = Pawn(Player.BLACK)
         pawn_square = Square.at(3, 4)
@@ -405,6 +405,185 @@ class TestPawns:
         assert Square.at(4, 6) in moves
         assert Square.at(4, 3) in moves
         assert Square.at(4, 2) in moves
+
+    @staticmethod
+    def test_bishop_can_move_forwardslash():
+        # Arrange
+        board = Board.empty()
+        bishop = Bishop(Player.BLACK)
+        bishop_square = Square.at(4, 4)
+        board.set_piece(bishop_square, bishop)
+
+        # Act
+        moves = bishop.get_available_moves(board)
+
+        # Assert
+        assert Square.at(5, 5) in moves
+        assert Square.at(6, 6) in moves
+        assert Square.at(3, 3) in moves
+        assert Square.at(2, 2) in moves
+
+    @staticmethod
+    def test_bishop_cannot_move_if_piece_in_front():
+        # Arrange
+        board = Board.empty()
+        bishop = Bishop(Player.WHITE)
+        bishop_square = Square.at(4, 4)
+        board.set_piece(bishop_square, bishop)
+
+        enemy = Pawn(Player.BLACK)
+        enemy_square = Square.at(5, 5)
+        board.set_piece(enemy_square, enemy)
+
+        # Act
+        moves = bishop.get_available_moves(board)
+
+        # Assert
+        print(moves)
+        assert Square.at(5, 5) in moves
+        assert Square.at(6, 6) not in moves
+        assert Square.at(7, 7) not in moves
+        assert Square.at(2, 2) in moves
+
+
+    @staticmethod
+    def test_bishop_cannot_move_off_board():
+        # Arrange
+        board = Board.empty()
+        bishop = Bishop(Player.BLACK)
+        bishop_square = Square.at(4, 4)
+        board.set_piece(bishop_square, bishop)
+
+        # Act
+        moves = bishop.get_available_moves(board)
+        # Assert
+        assert Square.at(0, 0) in moves
+        assert Square.at(7, 7) in moves
+        assert Square.at(8, 8) not in moves
+        assert Square.at(-1, -1) not in moves
+
+    @staticmethod
+    def test_bishop_can_move_on_backslash():
+        # Arrange
+        board = Board.empty()
+        bishop = Bishop(Player.BLACK)
+        bishop_square = Square.at(4, 4)
+        board.set_piece(bishop_square, bishop)
+
+        # Act
+        moves = bishop.get_available_moves(board)
+
+        # Assert
+        assert Square.at(3, 5) in moves
+        assert Square.at(2, 6) in moves
+        assert Square.at(5, 3) in moves
+        assert Square.at(6, 2) in moves
+
+    @staticmethod
+    def test_queen_can_move_horizontally():
+        # Arrange
+        board = Board.empty()
+        queen = Queen(Player.BLACK)
+        queen_square = Square.at(4, 4)
+        board.set_piece(queen_square, queen)
+
+        # Act
+        moves = queen.get_available_moves(board)
+
+        # Assert
+        assert Square.at(4, 5) in moves
+        assert Square.at(4, 6) in moves
+        assert Square.at(4, 3) in moves
+        assert Square.at(4, 2) in moves
+
+    @staticmethod
+    def test_queen_can_move_forwardslash():
+        # Arrange
+        board = Board.empty()
+        queen = Queen(Player.BLACK)
+        queen_square = Square.at(4, 4)
+        board.set_piece(queen_square, queen)
+
+        # Act
+        moves = queen.get_available_moves(board)
+
+        # Assert
+        assert Square.at(5, 5) in moves
+        assert Square.at(6, 6) in moves
+        assert Square.at(3, 3) in moves
+        assert Square.at(2, 2) in moves
+
+    @staticmethod
+    def test_queen_cannot_move_if_piece_in_front():
+        # Arrange
+        board = Board.empty()
+        queen = Queen(Player.WHITE)
+        queen_square = Square.at(4, 4)
+        board.set_piece(queen_square, queen)
+
+        enemy = Pawn(Player.BLACK)
+        enemy_square = Square.at(5, 5)
+        board.set_piece(enemy_square, enemy)
+
+        # Act
+        moves = queen.get_available_moves(board)
+
+        # Assert
+        print(moves)
+        assert Square.at(5, 5) in moves
+        assert Square.at(6, 6) not in moves
+        assert Square.at(7, 7) not in moves
+        assert Square.at(2, 2) in moves
+
+    @staticmethod
+    def test_queen_cannot_move_off_board():
+        # Arrange
+        board = Board.empty()
+        queen = Queen(Player.BLACK)
+        queen_square = Square.at(4, 4)
+        board.set_piece(queen_square, queen)
+
+        # Act
+        moves = queen.get_available_moves(board)
+        # Assert
+        assert Square.at(0, 0) in moves
+        assert Square.at(7, 7) in moves
+        assert Square.at(8, 8) not in moves
+        assert Square.at(-1, -1) not in moves
+
+    @staticmethod
+    def test_queen_can_move_on_backslash():
+        # Arrange
+        board = Board.empty()
+        queen = Queen(Player.BLACK)
+        queen_square = Square.at(4, 4)
+        board.set_piece(queen_square, queen)
+
+        # Act
+        moves = queen.get_available_moves(board)
+
+        # Assert
+        assert Square.at(3, 5) in moves
+        assert Square.at(2, 6) in moves
+        assert Square.at(5, 3) in moves
+        assert Square.at(6, 2) in moves
+
+    @staticmethod
+    def test_queen_can_move_vertically():
+        # Arrange
+        board = Board.empty()
+        queen = Queen(Player.BLACK)
+        queen_square = Square.at(4, 4)
+        board.set_piece(queen_square, queen)
+
+        # Act
+        moves = queen.get_available_moves(board)
+
+        # Assert
+        assert Square.at(5, 4) in moves
+        assert Square.at(6, 4) in moves
+        assert Square.at(3, 4) in moves
+        assert Square.at(2, 4) in moves
 
 
 
