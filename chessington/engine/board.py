@@ -11,6 +11,7 @@ from chessington.engine.pieces import Pawn, Knight, Bishop, Rook, Queen, King
 
 BOARD_SIZE = 8
 
+
 class Board:
     """
     A representation of the chess board, and the pieces on it.
@@ -92,11 +93,23 @@ class Board:
             if isinstance(moving_piece, Pawn) & (to_square.row == 0 or to_square.row == 7):
                 moving_piece = Queen(self.current_player)
             self.handle_castling(from_square, to_square, moving_piece)
+            en_passant = False
+            if isinstance(moving_piece, Pawn):
+                self.handle_en_passant(from_square, to_square)
+                if (((to_square.row == 3) & (from_square.row == 1))
+                        or ((to_square.row == 4) & (from_square.row == 6))):
+                    en_passant = True
             self.set_piece(to_square, moving_piece)
             self.set_piece(from_square, None)
             moving_piece.moved = True
-            self.last_move = (moving_piece, to_square)
+            self.last_move = (moving_piece, to_square, en_passant)
             self.current_player = self.current_player.opponent()
+
+    def handle_en_passant(self, from_square, to_square):
+        if self.last_move is not None:
+            if self.last_move[2] & (self.last_move[1].row == from_square.row):
+                if self.last_move[1].col == to_square.col:
+                    self.set_piece(self.last_move[1], None)
 
     def handle_castling(self, from_square, to_square, piece):
         if not isinstance(piece, King):
