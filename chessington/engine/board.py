@@ -87,18 +87,42 @@ class Board:
         raise Exception('The supplied piece is not on the board')
 
     def bot_move(self):
-        if self.current_player == Player.BLACK:
-            all_moves = []
-            for row in range(BOARD_SIZE):
-                for col in range(BOARD_SIZE):
-                    piece_in_square = self.board[row][col]
-                    if piece_in_square is None:
-                        continue
-                    if (piece_in_square.player == Player.BLACK) & (piece_in_square.get_available_moves(self) != []):
-                        all_moves.append((piece_in_square, piece_in_square.get_available_moves(self)))
-            move = random.choice(all_moves)
-            print(move)
-            self.move_piece(self.find_piece(move[0]), random.choice(move[1]))
+        all_moves = []
+        for row in range(BOARD_SIZE):
+            for col in range(BOARD_SIZE):
+                piece_in_square = self.board[row][col]
+                if piece_in_square is None:
+                    continue
+                if (piece_in_square.player == Player.BLACK) & (piece_in_square.get_available_moves(self) != []):
+                    all_moves.append((piece_in_square, piece_in_square.get_available_moves(self)))
+        highest_moves = []
+        for piece_moves in all_moves:
+            highest_moves.append((piece_moves[0], self.get_best_move(piece_moves)))
+        random_piece_move = random.choice(highest_moves)
+        best_score = random_piece_move[1][1]
+        best_move = random_piece_move[1][0]
+        from_square = self.find_piece(random_piece_move[0])
+        for piece_move in highest_moves:
+            # print(f'{piece_move[1][1]}   {best_score}')
+            if piece_move[1][1] > best_score:
+                best_score = piece_move[1][1]
+                best_move = piece_move[1][0]
+                from_square = self.find_piece(piece_move[0])
+        self.move_piece(from_square, best_move)
+
+    def get_best_move(self, piece_moves):
+        highest_score = 0
+        best_move = piece_moves[1][0]
+        for move in piece_moves[1]:
+            move_score = 0
+            points = {Pawn: 10, Knight: 30, Bishop: 30, Rook: 50, Queen: 90, King: 900}
+            for piece in points:
+                if isinstance(self.get_piece(move), piece):
+                    move_score = points[piece]
+            if move_score > highest_score:
+                best_move = move
+                highest_score = move_score
+        return best_move, highest_score
 
     def move_piece(self, from_square, to_square):
         """
@@ -120,7 +144,8 @@ class Board:
             moving_piece.moved = True
             self.last_move = (moving_piece, to_square, en_passant)
             self.current_player = self.current_player.opponent()
-            self.bot_move()
+            if self.current_player == Player.BLACK:
+                self.bot_move()
 
     def handle_en_passant(self, from_square, to_square):
         if self.last_move is not None:
