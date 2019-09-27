@@ -86,7 +86,19 @@ class Board:
                     return Square.at(row, col)
         raise Exception('The supplied piece is not on the board')
 
-    def bot_move(self):
+    def in_check(self):
+        for row in range(BOARD_SIZE):
+            for col in range(BOARD_SIZE):
+                piece_in_square = self.board[row][col]
+                if piece_in_square is None:
+                    continue
+                moves = piece_in_square.get_available_moves(self)
+                for move in moves:
+                    target = self.get_piece(move)
+                    if isinstance(target, King):
+                        return move
+
+    def get_bot_move_squares(self):
         all_moves = []
         for row in range(BOARD_SIZE):
             for col in range(BOARD_SIZE):
@@ -103,12 +115,11 @@ class Board:
         best_move = random_piece_move[1][0]
         from_square = self.find_piece(random_piece_move[0])
         for piece_move in highest_moves:
-            # print(f'{piece_move[1][1]}   {best_score}')
             if piece_move[1][1] > best_score:
                 best_score = piece_move[1][1]
                 best_move = piece_move[1][0]
                 from_square = self.find_piece(piece_move[0])
-        self.move_piece(from_square, best_move)
+        return from_square, best_move
 
     def get_best_move(self, piece_moves):
         highest_score = 0
@@ -144,8 +155,6 @@ class Board:
             moving_piece.moved = True
             self.last_move = (moving_piece, to_square, en_passant)
             self.current_player = self.current_player.opponent()
-            if self.current_player == Player.BLACK:
-                self.bot_move()
 
     def handle_en_passant(self, from_square, to_square):
         if self.last_move is not None:

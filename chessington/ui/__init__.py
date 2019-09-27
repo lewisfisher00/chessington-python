@@ -16,6 +16,7 @@ BLACK_SQUARE_COLOUR = '#B58863'
 WHITE_SQUARE_COLOUR = '#F0D9B5'
 FROM_SQUARE_COLOUR = '#33A1FF'
 TO_SQUARE_COLOUR = '#B633FF'
+CHECK_SQUARE_COLOUR = '#FF0000'
 
 
 def get_image_name_from_piece(piece):
@@ -95,6 +96,8 @@ def play_game():
         nonlocal window, board, from_square, to_squares
         clicked_piece = board.get_piece(Square.at(row, col))
 
+        # if board.current_player == Player.BLACK:
+            # board.move_piece(bot_move_from_to[0], bot_move_from_to[1])
         # If making an allowed move, then make it
         if from_square is not None and any(s.row == row and s.col == col for s in to_squares):
             board.get_piece(from_square).move_to(board, Square.at(row, col))
@@ -118,4 +121,11 @@ def play_game():
 
         # Update the UI
         highlight_squares(window, from_square, to_squares)
+        # if board.current_player == Player.BLACK:
+        #     bot_move_from_to = board.get_bot_move_squares()
+        #     piece_moves = board.get_piece(bot_move_from_to[0]).get_available_moves(board)
+        #     highlight_squares(window, bot_move_from_to[0], piece_moves)
+        square_in_check = board.in_check()
+        if square_in_check is not None:
+            set_square_colour(window, square_in_check, CHECK_SQUARE_COLOUR)
         update_pieces(window, board)
