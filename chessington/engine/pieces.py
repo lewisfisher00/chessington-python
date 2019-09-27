@@ -99,9 +99,10 @@ class Pawn(Piece):
     def check_en_passant(self, board, candidate_square, direction):
         moves = []
         if board.last_move is not None:
-            if (board.get_piece(candidate_square) == board.last_move[0]) & candidate_square.is_on_board():
-                if board.last_move[2]:
-                    moves.append(Square.at(candidate_square.row + direction, candidate_square.col))
+            if candidate_square.is_on_board():
+                if board.get_piece(candidate_square) == board.last_move[0]:
+                    if board.last_move[2]:
+                        moves.append(Square.at(candidate_square.row + direction, candidate_square.col))
         return moves
 
 class Knight(Piece):
